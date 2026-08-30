@@ -8,6 +8,10 @@ public class EconomyService_DH
 // 계산식은 나중에 static 클래스로 관리
 {
 
+    private int _incomeGoldBase = 10;
+    private float _goldInterval = 2.0f;
+    private float _timer = 0.0f;
+
     private EconomyViewModel_DH _economyViewModel; // 뷰모델 선언
 
     private readonly Dictionary<string,CatEncyclopediaViewModel> _catEncyclopediaList = new();
@@ -20,6 +24,7 @@ public class EconomyService_DH
     {
         InitCatEncyclopediaList();
     }
+
 
     public void InitCatEncyclopediaList()
     {
@@ -92,103 +97,6 @@ public class EconomyService_DH
         _economyViewModel.SpecialCatMultiply = totalMulti;
     }
 
-
-    public EconomyViewModel_DH GetEconomyViewModel()
-    {
-        if (_economyViewModel == null)
-        {
-            _economyViewModel = CreateEconomyViewModel();
-        }
-
-        return _economyViewModel;
-    }
-    public EconomyViewModel_DH CreateEconomyViewModel()
-    {
-        var economyViewModel = new EconomyViewModel_DH();
-        economyViewModel.CurrentGold = 10;
-        economyViewModel.CatCurrentCount = 0;
-        economyViewModel.SpecialCatAdd = 0;
-        economyViewModel.SpecialCatMultiply = 0.0f;
-        economyViewModel.BuildingCount = 0;
-
-        return economyViewModel;
-    }
-
-
-
-    public void AddCurrentGold(int Gold)
-    {
-        if (_economyViewModel != null)
-        {
-            _economyViewModel.CurrentGold += Gold;
-        }
-    }
-
-    public void RemoveCurrentGold(int Gold)
-    {
-        if (_economyViewModel != null)
-        {
-            _economyViewModel.CurrentGold -= Gold;
-        }
-    }
-
-
-
-    public void AddCurrentFish(int Fish)
-    {
-        if (_economyViewModel != null)
-        {
-            _economyViewModel.CurrentFish += Fish;
-        }
-    }
-
-    public void RemoveCurrentFish(int Fish)
-    {
-        if (_economyViewModel != null)
-        {
-            _economyViewModel.CurrentFish -= Fish;
-        }
-    }
-
-
-
-    public void AddCatCurrentCount(int CatCurrentCount)
-    {
-        if (_economyViewModel != null)
-        {
-            _economyViewModel.CatCurrentCount += CatCurrentCount;
-        }
-    }
-
-    public void RemoveCatCurrentCount(int CatCurrentCount)
-    {
-        if (_economyViewModel != null)
-        {
-            _economyViewModel.CatCurrentCount -= CatCurrentCount;
-        }
-    }
-
-
-
-    public void AddCatFromBuilding(int addAmount)
-    {
-        if (_economyViewModel != null)
-        {
-            _economyViewModel.CatCurrentCount += addAmount;
-            _economyViewModel.BuildingCount += 1;
-        }
-    }
-
-
-    public void RemoveCatFromBuilding(int removeAmount)
-    {
-        if (_economyViewModel != null)
-        {
-            _economyViewModel.CatCurrentCount -= removeAmount;
-            _economyViewModel.BuildingCount -= 1;
-        }
-    }
-
     public bool CheckClickCatIsNew(string catDataId)
     {
         if (!_catEncyclopediaList.TryGetValue(catDataId, out CatEncyclopediaViewModel catViewModel))
@@ -205,6 +113,112 @@ public class EconomyService_DH
     }
 
 
+    public void Tick(float deltaTime)
+    { 
+        if (_economyViewModel == null) return;
+
+        _timer += deltaTime;
+        if(_timer >= _goldInterval)
+        {
+            _timer -= _goldInterval;
+            int addGold = GetIncomeCurrentGold();
+            AddCurrentGold(addGold);
+        }
+    }
+
+    private int GetIncomeCurrentGold()
+    {
+        return GameUtil.CalcEconomyGold(_economyViewModel.CatCurrentCount, _incomeGoldBase, _economyViewModel.SpecialCatAdd, _economyViewModel.SpecialCatMultiply);
+    }
+
+
+
+    public EconomyViewModel_DH GetEconomyViewModel()
+    {
+        if (_economyViewModel == null)
+        {
+            _economyViewModel = CreateEconomyViewModel();
+        }
+
+        return _economyViewModel;
+    }
+
+    public EconomyViewModel_DH CreateEconomyViewModel()
+    {
+        var economyViewModel = new EconomyViewModel_DH();
+        economyViewModel.CurrentGold = 10;
+        economyViewModel.CatCurrentCount = 0;
+        economyViewModel.SpecialCatAdd = 0;
+        economyViewModel.SpecialCatMultiply = 0.0f;
+        economyViewModel.BuildingCount = 0;
+
+        return economyViewModel;
+    }
+
+
+    public void AddCurrentGold(int Gold)
+    {
+        if (_economyViewModel != null)
+        {
+            _economyViewModel.CurrentGold += Gold;
+        }
+    }
+    public void RemoveCurrentGold(int Gold)
+    {
+        if (_economyViewModel != null)
+        {
+            _economyViewModel.CurrentGold -= Gold;
+        }
+    }
+
+
+    public void AddCurrentFish(int Fish)
+    {
+        if (_economyViewModel != null)
+        {
+            _economyViewModel.CurrentFish += Fish;
+        }
+    }
+    public void RemoveCurrentFish(int Fish)
+    {
+        if (_economyViewModel != null)
+        {
+            _economyViewModel.CurrentFish -= Fish;
+        }
+    }
+
+    public void AddCatCurrentCount(int CatCurrentCount)
+    {
+        if (_economyViewModel != null)
+        {
+            _economyViewModel.CatCurrentCount += CatCurrentCount;
+        }
+    }
+    public void RemoveCatCurrentCount(int CatCurrentCount)
+    {
+        if (_economyViewModel != null)
+        {
+            _economyViewModel.CatCurrentCount -= CatCurrentCount;
+        }
+    }
+
+
+    public void AddCatFromBuilding(int addAmount)
+    {
+        if (_economyViewModel != null)
+        {
+            _economyViewModel.CatCurrentCount += addAmount;
+            _economyViewModel.BuildingCount += 1;
+        }
+    }
+    public void RemoveCatFromBuilding(int removeAmount)
+    {
+        if (_economyViewModel != null)
+        {
+            _economyViewModel.CatCurrentCount -= removeAmount;
+            _economyViewModel.BuildingCount -= 1;
+        }
+    }
 
     //public void AddSpecialCat(SepcialCatType catType) // 추후 특수 고양이 추가에 따른 계산식 변경을 담당할 메서드
     //{
