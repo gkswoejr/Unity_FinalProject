@@ -1,4 +1,4 @@
-﻿using Cysharp.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 public class GameManager : BaseManager<GameManager>
@@ -31,6 +31,11 @@ public class GameManager : BaseManager<GameManager>
         EnsureSingleton();
         SetupManagers();
         
+    }
+
+    private void Update()
+    {
+        EconomyService_DH?.Tick(Time.deltaTime);
     }
 
     private void InitService()
